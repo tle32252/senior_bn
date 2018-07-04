@@ -38,7 +38,7 @@ public class FileUploaderController {
 
         VideoModel n = new VideoModel();
         n.setTopic(topic);
-        n.setUrl("http://192.168.43.234:8083/hls/"+file.getOriginalFilename()+"/index.m3u8");
+        n.setUrl("http://localhost:8085/hls/"+file.getOriginalFilename()+"/index.m3u8");
         n.setDescription(description);
 //        n.se(categoryType);
         n.setFilepath(file.getOriginalFilename());

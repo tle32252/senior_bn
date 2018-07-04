@@ -15,22 +15,38 @@ import org.apache.commons.codec.binary.Base64OutputStream;
 import org.bouncycastle.crypto.tls.SignatureAlgorithm;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Type;
+import java.lang.Object.*;
 import java.security.Principal;
 import java.security.SecureRandom;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Base64;
-import java.util.Calendar;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+//import static org.junit.Assert.asser;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+
+import com.fasterxml.jackson.core.JsonGenerationException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 //@CrossOrigin(origins = "http://localhost:3000")
 
 @RequestMapping("/user")
@@ -136,6 +152,127 @@ public class UserController {
 
     }
 
+    @GetMapping(path="/check_paid_3") // Map ONLY GET Requests
+    public ResponseEntity checkPaid_3 (HttpServletRequest httpServletRequest) {
+        String e = httpServletRequest.toString();
+        String s = httpServletRequest.getHeader("Authorization");
+        System.out.println(s);
+        String q = httpServletRequest.getHeader("X-Original-URI");
+        String r = httpServletRequest.getHeader("X-Original-Method");
+        String v = httpServletRequest.getMethod();
+        if (r.equals("GET")){
+            if (s.equals("Bearer aaa")){
+//                System.out.println("Good");
+                return ResponseEntity.ok("");
+            }
+            else {
+//                System.out.println("Bad");
+                return new ResponseEntity(HttpStatus.FORBIDDEN);
+            }
+        }
+        return ResponseEntity.ok("");
+    }
+
+    @GetMapping(path="/decode") // Map ONLY GET Requests
+    public @ResponseBody String decoded (HttpServletRequest httpServletRequest) throws JOSEException, ParseException {
+        String autho = httpServletRequest.getHeader("Authorization");
+        String uri = httpServletRequest.getHeader("X-Original-URI");
+        String method = httpServletRequest.getHeader("X-Original-Method");
+
+        JWSObject jwsObject = JWSObject.parse(autho);
+        JWSVerifier verifier = new MACVerifier(secretKey.getBytes());
+        assertTrue(jwsObject.verify(verifier));
+        String decode = jwsObject.getPayload().toString();
+        return decode;
+    }
+
+    @GetMapping(path="/decode_jwt") // Map ONLY GET Requests
+    public ResponseEntity decode (HttpServletRequest httpServletRequest) throws JOSEException, ParseException, IOException {
+        String s = httpServletRequest.getHeader("Authorization");
+        String q = httpServletRequest.getHeader("X-Original-URI");
+        String r = httpServletRequest.getHeader("X-Original-Method");
+
+        System.out.println(s);
+        if (r.equals("GET")){
+            JWSObject jwsObject = JWSObject.parse(s);
+            JWSVerifier verifier = new MACVerifier(secretKey.getBytes());
+            assertTrue(jwsObject.verify(verifier));
+            ObjectMapper mapper = new ObjectMapper();
+            String value = jwsObject.getPayload().toJSONObject().toJSONString();
+
+            Map<String, Object> map = new HashMap<String, Object>();
+
+            // convert JSON string to Map
+            map = mapper.readValue(value, new TypeReference<Map<String, String>>(){});
+            String nameJwt = map.get("name").toString();
+            String timeJwt = map.get("expire").toString();
+            int timeFromToken = Integer.parseInt(timeJwt);
+            String url = map.get("video").toString();
+            String[] parts = url.split("/");
+            String[] partss = q.split("/");
+            String part1 = parts[4]; // 004
+            String part2 = partss[2];
+
+            System.out.println(timeJwt);
+//            System.out.println("url from jwt : "+part1);
+//            System.out.println("From header : "+part2);
+
+
+
+            UserModel e = userRepository.findByUsername(nameJwt);
+            if (e.getStatus().equals("Paid")){
+                Date currentDate = new Date();
+                Long ee  = currentDate.getTime()/1000;
+                String yy = ee.toString();
+                int currentTime = Integer.parseInt(yy);
+                int result = currentTime-timeFromToken;
+                return ResponseEntity.ok("OK");
+//                if (result < 600){
+//                    System.out.println(result);
+//                    return ResponseEntity.ok("OK");
+//                }
+//                else {
+//                    System.out.println("Token Expired");
+//                    return new ResponseEntity(HttpStatus.FORBIDDEN);
+//                }
+
+
+            }
+            else {
+                System.out.println("Very Bad");
+                return new ResponseEntity(HttpStatus.FORBIDDEN);
+            }
+
+        }
+        return ResponseEntity.ok("");
+
+//        if (e.getStatus().equals("Paid")){
+//            return "Treu";
+//        }
+//        else {
+//            return "False";
+
+
+
+//        System.out.println(map.get("name"));
+//        value = value.substring(1, value.length()-1);           //remove curly brackets
+//        String[] keyValuePairs = value.split(",");              //split the string to creat key-value pairs
+//        Map<String,String> map = new HashMap<>();
+//
+//        for(String pair : keyValuePairs)                        //iterate over the pairs
+//        {
+//            String[] entry = pair.split("=");                   //split the pairs to get key and value
+//            map.put(entry[0].trim(), entry[1].trim());          //add them to the hashmap and trim whitespaces
+//        }
+//
+//        System.out.println(map);
+
+
+//        return value;
+    }
+
+
+
     @GetMapping(path="/check_paid_1") // Map ONLY GET Requests
     public @ResponseBody Boolean checkPaid (@RequestParam String username) {
         UserModel e = userRepository.findByUsername(username);
@@ -159,23 +296,26 @@ public class UserController {
         }
     }
 
+    @Value("${senior.secret:aaa}")
+    private String secretKey;
+
     @PostMapping(path="/make_jwt") // Map ONLY GET Requests
-    public @ResponseBody String makeJwt (@RequestParam("username") String username,@RequestParam("video") String video) throws JOSEException {
-        String key = "tttt";
+    public @ResponseBody String makeJwt (@RequestParam String username,@RequestParam String video) throws JOSEException {
         Calendar cal = Calendar.getInstance();
         SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
+        Date currentDate = new Date();
+        Long ee  = currentDate.getTime()/1000;
+        String yy = ee.toString();
         cal.add(Calendar.HOUR_OF_DAY, 1);
 //        System.out.println( sdf.format(cal.getTime()).toString() );
         Map<String, String> payload = new TreeMap<>();
         payload.put("name", username);
         payload.put("video", video);
-        payload.put("expire", sdf.format(cal.getTime()).toString());
+        payload.put("expire", yy);
 
         JSONObject payloadJson =  new JSONObject(payload);
 
-        SecureRandom random = new SecureRandom();
-        byte[] sharedSecret = new byte[32];
-        random.nextBytes(sharedSecret);
+        byte[] sharedSecret = secretKey.getBytes();
 
         JWSSigner signer = null;
         try {
@@ -186,35 +326,15 @@ public class UserController {
         JWSObject jwsObject = new JWSObject(new JWSHeader(JWSAlgorithm.HS256), new Payload(payloadJson.toString()));
         jwsObject.sign(signer);
         String s = jwsObject.serialize();
-
-
-
-//        String headerString = header.toString();
-//        String payloadString = payload.toString();
-
-        //JSONObject headerJson =  new JSONObject(header);
-
-
-        //convet to payloadJsonStr
-
-        //String encodedHeader = Base64.getEncoder().encodeToString(headerString.getBytes());
-//        String encodedPayload = Base64.getEncoder().encodeToString(payloadString.getBytes());
-        //String data = encodedHeader+"."+encodedPayload;
-
-        //System.out.println(encodedHeader);
-//        System.out.println(encodedPayload);
-
-
-//        byte[] decodedBytes = Base64.getDecoder().decode(encodedHeader);
-//        String decodedString = new String(decodedBytes);
-
-//        System.out.println(decodedString);
-
-//        JSONObject jso = new JSONObject( header );
-//        String encoded = new String(Base64.Encoder( jso.toString( 4 ).toByteArray()));
+//        System.out.println(s);
 
         return s;
     }
+
+
+
+
+
 
     public static String serialize(Object object) throws IOException {
         ByteArrayOutputStream byteaOut = new ByteArrayOutputStream();
@@ -242,4 +362,3 @@ public class UserController {
         return new Gson().fromJson(new String(byteaOut.toByteArray()), type);
     }
 }
-
