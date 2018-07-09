@@ -6,5 +6,6 @@ import org.springframework.data.repository.CrudRepository;
 import java.util.List;
 
 public interface VideoRepository extends CrudRepository<VideoModel, Long>{
+    VideoModel findById(Long id);
 //    List<Menu> findAllByCategoryTypeAndActive(CategoryType categoryType, Boolean Input);
 }

@@ -46,7 +46,7 @@ public class FileUploaderController {
 
         videoRepository.save(n);
 
-        try {
+        try { 
             file.transferTo(Paths.get(storageProperties.getLocation(), file.getOriginalFilename()).toFile()); //new File("/Users/tleetanyaluck/" + file.getName())
         } catch (IOException e) {
             e.printStackTrace();

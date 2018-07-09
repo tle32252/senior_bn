@@ -28,7 +28,7 @@ public class WebSec extends WebSecurityConfigurerAdapter {
 
         http
                 .authorizeRequests()
-                .antMatchers("/login", "/logout","/user/register","/user/make_jwt","/user/decode_jwt","/user/check_paid_1","/user/check_paid_3", "/post_new_topic", "/check_null_topic", "/post_old_topic", "/each_topic", "/topic_item", "/check_score", "/user/omiseCharge", "/user/all_student", "/delete_topic", "/delete_null_topic", "/delete_question", "/user/test", "/each_id", "/update_question", "/user/make_paid", "/user/each_student_login", "/video/upload", "/video_item").permitAll()
+                .antMatchers("/login", "/logout", "/upload_done", "/upload_videodone", "/whole_done","/user/register","/user/make_jwt","/user/decode_jwt","/user/check_paid_1","/user/check_paid_3", "/post_new_topic", "/check_null_topic", "/post_old_topic", "/each_topic", "/topic_item", "/check_score", "/user/omiseCharge", "/user/all_student", "/delete_topic", "/delete_null_topic", "/delete_question", "/user/test", "/each_id", "/update_question", "/user/make_paid", "/user/each_student_login", "/video/upload", "/video_item").permitAll()
                 .antMatchers("/**").authenticated()
                 .and()
                 .formLogin().loginProcessingUrl("/login")

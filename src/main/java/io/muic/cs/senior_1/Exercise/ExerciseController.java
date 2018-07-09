@@ -109,7 +109,7 @@ public class ExerciseController {
                 mark++;
             }
         }
-        System.out.println(studans);
+//        System.out.println(studans);
         return mark;
     }
 

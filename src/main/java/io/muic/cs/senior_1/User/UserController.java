@@ -192,7 +192,7 @@ public class UserController {
         String q = httpServletRequest.getHeader("X-Original-URI");
         String r = httpServletRequest.getHeader("X-Original-Method");
 
-        System.out.println(s);
+//        System.out.println(s);
         if (r.equals("GET")){
             JWSObject jwsObject = JWSObject.parse(s);
             JWSVerifier verifier = new MACVerifier(secretKey.getBytes());
@@ -213,9 +213,9 @@ public class UserController {
             String part1 = parts[4]; // 004
             String part2 = partss[2];
 
-            System.out.println(timeJwt);
-//            System.out.println("url from jwt : "+part1);
-//            System.out.println("From header : "+part2);
+//            System.out.println(timeJwt);
+            System.out.println("url from jwt : "+part1);
+            System.out.println("From header : "+part2);
 
 
 
@@ -226,17 +226,21 @@ public class UserController {
                 String yy = ee.toString();
                 int currentTime = Integer.parseInt(yy);
                 int result = currentTime-timeFromToken;
-                return ResponseEntity.ok("OK");
-//                if (result < 600){
-//                    System.out.println(result);
+//                return ResponseEntity.ok("OK");
+                if (result < 600){
+                    System.out.println(result);
 //                    return ResponseEntity.ok("OK");
-//                }
-//                else {
-//                    System.out.println("Token Expired");
-//                    return new ResponseEntity(HttpStatus.FORBIDDEN);
-//                }
-
-
+                    if (part1.equals(part2)){
+                        return ResponseEntity.ok("OK");
+                    }
+                    else{
+                        return new ResponseEntity(HttpStatus.FORBIDDEN);
+                    }
+                }
+                else {
+                    System.out.println("Token Expired");
+                    return new ResponseEntity(HttpStatus.FORBIDDEN);
+                }
             }
             else {
                 System.out.println("Very Bad");

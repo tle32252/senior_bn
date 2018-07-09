@@ -38,4 +38,14 @@ public class VideoController {
         System.out.println(" ----- Find all vids ----- ");
         return videoRepository.findAll();
     }
+
+    @RequestMapping(value = "/delete_video", method =  RequestMethod.POST)
+    public  ResponseEntity deleteVideo (@RequestParam Long id){
+        VideoModel e = videoRepository.findById(id);
+        videoRepository.delete(e);
+
+        return ResponseEntity.ok("OK");
+    }
+
+
 }
