@@ -16,6 +16,15 @@ public class ExerciseModel {
     private String choiceC;
     private String choiceD;
     private String correct;
+    private Integer rank;
+
+    public Integer getRank() {
+        return rank;
+    }
+
+    public void setRank(Integer rank) {
+        this.rank = rank;
+    }
 
     public Long getId() {
         return id;

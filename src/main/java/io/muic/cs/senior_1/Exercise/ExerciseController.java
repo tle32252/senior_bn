@@ -28,6 +28,7 @@ public class ExerciseController {
         TopicModel t = new TopicModel();
 
         e.setTopic(exer.getTopic());
+        e.setRank(exer.getRank());
         e.setQuestion(exer.getQuestion());
         e.setChoiceA(exer.getChoiceA());
         e.setChoiceB(exer.getChoiceB());
@@ -52,6 +53,7 @@ public class ExerciseController {
 
         e.setTopic(exer.getTopic());
         e.setQuestion(exer.getQuestion());
+        e.setRank(exer.getRank());
         e.setChoiceA(exer.getChoiceA());
         e.setChoiceB(exer.getChoiceB());
         e.setChoiceC(exer.getChoiceC());
@@ -65,7 +67,7 @@ public class ExerciseController {
 
     @GetMapping(path="/each_topic")
     public @ResponseBody Iterable<ExerciseModel> eachTopic (@RequestParam String topic){
-        return exerciseRepository.findByTopic(topic);
+        return exerciseRepository.findByTopicOrderByRankAsc(topic);
     }
 
     @GetMapping(path="/check_null_topic")
@@ -182,6 +184,7 @@ public class ExerciseController {
 
 
         e.setQuestion(exer.getQuestion());
+        e.setRank(exer.getRank());
         e.setChoiceA(exer.getChoiceA());
         e.setChoiceB(exer.getChoiceB());
         e.setChoiceC(exer.getChoiceC());
