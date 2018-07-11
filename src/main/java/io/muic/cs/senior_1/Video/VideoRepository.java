@@ -7,5 +7,8 @@ import java.util.List;
 
 public interface VideoRepository extends CrudRepository<VideoModel, Long>{
     VideoModel findById(Long id);
+    VideoModel findByTopic(String Topic);
+//    Iterable<VideoModel> findAllOrderByTopicAsc();
+    public List<VideoModel> findAllByOrderByTopicAsc();
 //    List<Menu> findAllByCategoryTypeAndActive(CategoryType categoryType, Boolean Input);
 }

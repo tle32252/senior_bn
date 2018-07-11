@@ -11,6 +11,16 @@ public class DoneModel {
     private Long id;
     private String username;
     private Long exerciseid;
+    private String exercise;
+
+    public String getExercise() {
+        return exercise;
+    }
+
+    public void setExercise(String exercise) {
+        this.exercise = exercise;
+    }
+
     private Integer score;
     private Integer outof;
 

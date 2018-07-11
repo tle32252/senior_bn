@@ -34,9 +34,15 @@ public class VideoController {
     private VideoRepository videoRepository;
 
     @GetMapping(path="/video_item")
-    public @ResponseBody Iterable<VideoModel> videoItem (){
+    public @ResponseBody List<VideoModel> videoItem (){
         System.out.println(" ----- Find all vids ----- ");
-        return videoRepository.findAll();
+        return videoRepository.findAllByOrderByTopicAsc();
+    }
+
+    @GetMapping(path="/eachvideo_item")
+    public @ResponseBody VideoModel eachvideoItem (@RequestParam String topic){
+        System.out.println(" ----- Find one vid ----- ");
+        return videoRepository.findByTopic(topic);
     }
 
     @RequestMapping(value = "/delete_video", method =  RequestMethod.POST)

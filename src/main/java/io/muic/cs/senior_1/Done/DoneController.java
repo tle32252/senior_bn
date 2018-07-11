@@ -22,8 +22,8 @@ public class DoneController {
     private DoneRepository doneRepository;
 
     @PostMapping("/upload_done")
-    public ResponseEntity uploadDone(@RequestParam String username, @RequestParam Long exercise, @RequestParam Integer score, @RequestParam Integer outof){
-        DoneModel ee = doneRepository.findByUsernameAndExerciseid(username,exercise);
+    public ResponseEntity uploadDone(@RequestParam String username,@RequestParam String exercise, @RequestParam Long exerciseid, @RequestParam Integer score, @RequestParam Integer outof){
+        DoneModel ee = doneRepository.findByUsernameAndExerciseid(username,exerciseid);
 //        System.out.println(ee);
 //        DoneModel d = new DoneModel();
 //        d.setUsername(username);
@@ -34,7 +34,8 @@ public class DoneController {
         if (ee == null){
             DoneModel d = new DoneModel();
             d.setUsername(username);
-            d.setExerciseid(exercise);
+            d.setExercise(exercise);
+            d.setExerciseid(exerciseid);
             d.setOutof(outof);
             d.setScore(score);
             doneRepository.save(d);
