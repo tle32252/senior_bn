@@ -81,6 +81,7 @@ public class UserController {
 
         return ResponseEntity.badRequest().body("Cant Register");
     }
+    
 
     @PostMapping("/omiseCharge")
     public @ResponseBody String chargee  (@RequestParam String omisetoken, @RequestParam String username) throws OmiseException, ClientException{
